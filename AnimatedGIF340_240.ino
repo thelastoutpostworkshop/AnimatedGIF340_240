@@ -17,12 +17,10 @@ TFT_eSPI tft = TFT_eSPI();
 
 #define DISPLAY_WIDTH tft.width()
 #define DISPLAY_HEIGHT tft.height()
-#define BUFFER_SIZE 256
-uint16_t usTemp[BUFFER_SIZE];
 
 // GIF
 #define GIF_Rotation 3      // Adjust Rotation of your screen (0-3)
-#define GifData star_destroyer_planet  // Change image to display (image name in gif_files\[image header file].h)
+#define GifData x_wing  // Change image to display (image name in gif_files\[image header file].h)
 
 AnimatedGIF gif;
 
@@ -75,6 +73,8 @@ int openGif()
   return gif.open((uint8_t *)GifData, sizeof(GifData), GIFDraw);
 }
 
+#define BUFFER_SIZE 256
+uint16_t usTemp[BUFFER_SIZE];
 // Draw a line from the current frame
 void GIFDraw(GIFDRAW *pDraw)
 {
