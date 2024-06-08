@@ -1,8 +1,7 @@
 // Your Eyes on Round Display
 //
 
-#include <TFT_eSPI.h>    // Install this library with the Arduino IDE Library Manager
-                         // Don't forget to configure the driver for the display!
+#include <bb_spi_lcd.h>  // Install this library with the Arduino IDE Library Manager
 #include <AnimatedGIF.h> // Install this library with the Arduino IDE Library Manager
 
 // Eyes GIF files
@@ -13,29 +12,35 @@
 #include "gif_files\star_destroyer.h"
 #include "gif_files\star_destroyer_planet.h"
 
-TFT_eSPI tft = TFT_eSPI();
+uint8_t *pTurboBuffer, *frameBuffer;
 
-#define DISPLAY_WIDTH tft.width()
-#define DISPLAY_HEIGHT tft.height()
+BB_SPI_LCD tft;
+AnimatedGIF gif;
 
 // GIF
-#define GIF_Rotation 3      // Adjust Rotation of your screen (0-3)
-#define GifData x_wing  // Change image to display (image name in gif_files\[image header file].h)
-
-AnimatedGIF gif;
+#define GIF_Rotation 3 // Adjust Rotation of your screen (0-3)
+#define GifData star_destroyer  // Change image to display (image name in gif_files\[image header file].h)
 
 void setup()
 {
   Serial.begin(115200);
-  tft.init();
+  tft.begin(LCD_ILI9341, FLAGS_NONE, 40000000, 8, 3, 9, -1, -1, 17, 18);
+  if (!allocateBufferForGif(tft.width(), tft.height()))
+  {
+    Serial.println("Not Enough memory!");
+    while (true)
+      ;
+  }
+  tft.setRotation(LCD_ORIENTATION_270); // Make sure you have the right orientation based on your GIF
   tft.fillScreen(TFT_BLACK);
-  tft.setRotation(GIF_Rotation);
+
   if (!openGif())
   {
     Serial.println("Cannot open GIF");
     printGifErrorMessage(gif.getLastError());
     while (true)
     {
+      //  no need to continue
     }
   }
 }
@@ -47,139 +52,65 @@ void loop()
 
 void playGifFrame()
 {
-  tft.startWrite();
-  gif.playFrame(true, NULL);
-  tft.endWrite();
+  gif.playFrame(false, NULL);
 }
 
 int openGif()
 {
-  gif.begin(BIG_ENDIAN_PIXELS);
-  // eye->pTurboGIFBuffer = (uint8_t *)heap_caps_malloc(TURBO_BUFFER_SIZE + (imageWidth * imageHeight), MALLOC_CAP_8BIT);
-  // if (eye->pTurboGIFBuffer == NULL)
-  // {
-  //   Serial.println("Could not allocate pTurboBuffer");
-  //   return 0;
-  // }
-  // eye->frameGIFBuffer = (uint8_t *)malloc(imageWidth * imageHeight * 2);
-  // if (eye->frameGIFBuffer == NULL)
-  // {
-  //   Serial.println("Could not allocate frameBuffer");
-  //   return 0;
-  // }
-  // eye->gif.setDrawType(GIF_DRAW_COOKED);
-  // eye->gif.setTurboBuf(eye->pTurboGIFBuffer);
-  // eye->gif.setFrameBuf(eye->frameGIFBuffer);
-  return gif.open((uint8_t *)GifData, sizeof(GifData), GIFDraw);
+  gif.begin(GIF_PALETTE_RGB565_BE); // Set the cooked output type we want (compatible with SPI LCDs)
+
+  int openGif;
+  openGif = gif.open((uint8_t *)GifData, sizeof(GifData), GIFDraw);
+  if (openGif)
+  {
+    Serial.printf("Successfully opened GIF; Canvas size = %d x %d\n", gif.getCanvasWidth(), gif.getCanvasHeight());
+    gif.setDrawType(GIF_DRAW_COOKED); // We want the library to generate ready-made pixels
+    gif.setFrameBuf(frameBuffer);
+    gif.setTurboBuf(pTurboBuffer); // Turbo Mode
+  }
+  return openGif;
 }
 
-#define BUFFER_SIZE 256
-uint16_t usTemp[BUFFER_SIZE];
-// Draw a line from the current frame
+bool allocateBufferForGif(int width, int height)
+{
+  int frameBufferSize = width * (height + 3);
+  frameBuffer = (uint8_t *)malloc(frameBufferSize);
+  if (frameBuffer == NULL)
+  {
+    Serial.println("Not enough memory to allocate the frame buffer");
+    return false;
+  }
+
+  int iTurboSize = TURBO_BUFFER_SIZE + (width * height);
+  pTurboBuffer = (uint8_t *)malloc(iTurboSize);
+  if (pTurboBuffer == NULL)
+  {
+    Serial.println("Not enough memory to allocate the turbo buffer");
+    return false;
+  }
+  return true;
+}
+
+//
+// Draw callback from the AnimatedGIF decoder
+//
+// Called once for each line of the current frame
+// MCUs with minimal RAM would have to process "RAW" pixels into "COOKED" here.
+// "Cooking" involves testing for disposal methods, merging non-transparent pixels
+// and translating the raw pixels through the palette to generate the final output.
+// The code for MCUs with enough RAM is much simpler because the AnimatedGIF library can
+// generate "cooked" pixels that are ready to send to the display as-is.
+//
 void GIFDraw(GIFDRAW *pDraw)
 {
-  uint8_t *s;
-  uint16_t *d, *usPalette;
-  int x, y, iWidth, iCount;
-
-  // Displ;ay bounds chech and cropping
-  iWidth = pDraw->iWidth;
-  if (iWidth + pDraw->iX > DISPLAY_WIDTH)
-    iWidth = DISPLAY_WIDTH - pDraw->iX;
-  usPalette = pDraw->pPalette;
-  y = pDraw->iY + pDraw->y; // current line
-  if (y >= DISPLAY_HEIGHT || pDraw->iX >= DISPLAY_WIDTH || iWidth < 1)
-    return;
-
-  // Old image disposal
-  s = pDraw->pPixels;
-  if (pDraw->ucDisposalMethod == 2) // restore to background color
-  {
-    for (x = 0; x < iWidth; x++)
-    {
-      if (s[x] == pDraw->ucTransparent)
-        s[x] = pDraw->ucBackground;
-    }
-    pDraw->ucHasTransparency = 0;
+  if (pDraw->y == 0)
+  { // set the memory window (once per frame) when the first line is rendered
+    tft.setAddrWindow(pDraw->iX, pDraw->iY, pDraw->iWidth, pDraw->iHeight);
   }
-
-  // Apply the new pixels to the main image
-  if (pDraw->ucHasTransparency) // if transparency used
-  {
-    uint8_t *pEnd, c, ucTransparent = pDraw->ucTransparent;
-    pEnd = s + iWidth;
-    x = 0;
-    iCount = 0; // count non-transparent pixels
-    while (x < iWidth)
-    {
-      c = ucTransparent - 1;
-      d = &usTemp[0];
-      while (c != ucTransparent && s < pEnd && iCount < BUFFER_SIZE)
-      {
-        c = *s++;
-        if (c == ucTransparent) // done, stop
-        {
-          s--; // back up to treat it like transparent
-        }
-        else // opaque
-        {
-          *d++ = usPalette[c];
-          iCount++;
-        }
-      } // while looking for opaque pixels
-      if (iCount) // any opaque pixels?
-      {
-        // DMA would degrtade performance here due to short line segments
-        tft.setAddrWindow(pDraw->iX + x, y, iCount, 1);
-        tft.pushPixels(usTemp, iCount);
-        x += iCount;
-        iCount = 0;
-      }
-      // no, look for a run of transparent pixels
-      c = ucTransparent;
-      while (c == ucTransparent && s < pEnd)
-      {
-        c = *s++;
-        if (c == ucTransparent)
-          x++;
-        else
-          s--;
-      }
-    }
-  }
-  else
-  {
-    s = pDraw->pPixels;
-
-    // Unroll the first pass to boost DMA performance
-    // Translate the 8-bit pixels through the RGB565 palette (already byte reversed)
-    if (iWidth <= BUFFER_SIZE)
-      for (iCount = 0; iCount < iWidth; iCount++)
-        usTemp[iCount] = usPalette[*s++];
-    else
-      for (iCount = 0; iCount < BUFFER_SIZE; iCount++)
-        usTemp[iCount] = usPalette[*s++];
-
-    tft.setAddrWindow(pDraw->iX, y, iWidth, 1);
-    tft.pushPixels(&usTemp[0], iCount);
-
-    iWidth -= iCount;
-    // Loop if pixel buffer smaller than width
-    while (iWidth > 0)
-    {
-      // Translate the 8-bit pixels through the RGB565 palette (already byte reversed)
-      if (iWidth <= BUFFER_SIZE)
-        for (iCount = 0; iCount < iWidth; iCount++)
-          usTemp[iCount] = usPalette[*s++];
-      else
-        for (iCount = 0; iCount < BUFFER_SIZE; iCount++)
-          usTemp[iCount] = usPalette[*s++];
-
-      tft.pushPixels(&usTemp[0], iCount);
-      iWidth -= iCount;
-    }
-  }
-}
+  // For all other lines, just push the pixels to the display. We requested 'COOKED'big-endian RGB565 and
+  // the library provides them here. No need to do anything except push them right to the display
+  tft.pushPixels((uint16_t *)pDraw->pPixels, pDraw->iWidth);
+} /* GIFDraw() */
 
 void printGifErrorMessage(int errorCode)
 {
