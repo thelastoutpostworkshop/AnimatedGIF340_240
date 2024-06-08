@@ -1,7 +1,8 @@
-// Your Eyes on Round Display
+// Master Animated GIF
 //
 
 #include <bb_spi_lcd.h>  // Install this library with the Arduino IDE Library Manager
+                         // Tested on version...
 #include <AnimatedGIF.h> // Install this library with the Arduino IDE Library Manager
 
 // Eyes GIF files
@@ -19,7 +20,7 @@ AnimatedGIF gif;
 
 // GIF
 #define GIF_Rotation 3 // Adjust Rotation of your screen (0-3)
-#define GifData star_destroyer  // Change image to display (image name in gif_files\[image header file].h)
+#define GifData hud_a  // Change image to display (image name in gif_files\[image header file].h)
 
 void setup()
 {
