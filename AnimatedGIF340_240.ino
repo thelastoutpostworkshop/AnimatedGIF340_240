@@ -5,8 +5,6 @@
                          // Tested on version...
 #include <AnimatedGIF.h> // Install this library with the Arduino IDE Library Manager
 
-// #define USE_TURBO_MODE // Comment this line if you have insufficient memory at run time or if the ESP32 crashes when playing the GIF
-
 // Eyes GIF files
 #include "gif_files\hud_a.h"
 #include "gif_files\x_wing.h"
@@ -64,14 +62,6 @@ int openGif()
       // Not Enough Memory
       return memAllocResult;
     }
-#ifdef USE_TURBO_MODE
-    memAllocResult = gif.allocTurboBuf(GIFAlloc);
-    if (memAllocResult != GIF_SUCCESS)
-    {
-      // Not Enough Memory
-      return memAllocResult;
-    }
-#endif
   }
   return openGif;
 }
