@@ -5,7 +5,7 @@
                          // Tested on version...
 #include <AnimatedGIF.h> // Install this library with the Arduino IDE Library Manager
 
-#define USE_TURBO_MODE // Comment this line if you have insufficient memory at run time or if the ESP32 crashes when playing the GIF
+// #define USE_TURBO_MODE // Comment this line if you have insufficient memory at run time or if the ESP32 crashes when playing the GIF
 
 // Eyes GIF files
 #include "gif_files\radar.h"
@@ -14,8 +14,6 @@
 #include "gif_files\death_star.h"
 #include "gif_files\star_destroyer.h"
 #include "gif_files\star_destroyer_planet.h"
-
-uint8_t *pTurboBuffer, *frameBuffer;
 
 BB_SPI_LCD tft;
 AnimatedGIF gif;
@@ -28,12 +26,6 @@ void setup()
 {
   Serial.begin(115200);
   tft.begin(LCD_ILI9341, FLAGS_NONE, 40000000, 8, 3, 9, -1, -1, 17, 18);
-  if (!allocateBufferForGif(tft.width(), tft.height()))
-  {
-    Serial.println("Not Enough memory!");
-    while (true)
-      ;
-  }
   tft.setRotation(LCD_ORIENTATION_270); // Make sure you have the right orientation based on your GIF
   tft.fillScreen(TFT_BLACK);
 
@@ -62,38 +54,43 @@ int openGif()
 {
   gif.begin(GIF_PALETTE_RGB565_BE); // Set the cooked output type we want (compatible with SPI LCDs)
 
-  int openGif;
+  int openGif, memAllocResult;
   openGif = gif.open((uint8_t *)GifData, sizeof(GifData), GIFDraw);
   if (openGif)
   {
     Serial.printf("Successfully opened GIF; Canvas size = %d x %d\n", gif.getCanvasWidth(), gif.getCanvasHeight());
     gif.setDrawType(GIF_DRAW_COOKED); // We want the library to generate ready-made pixels
-    gif.setFrameBuf(frameBuffer);
+    memAllocResult = gif.allocFrameBuf(GIFAlloc);
+    if (memAllocResult != GIF_SUCCESS)
+    {
+      // Not Enough Memory
+      return memAllocResult;
+    }
 #ifdef USE_TURBO_MODE
-    gif.setTurboBuf(pTurboBuffer); // Turbo Mode
+    memAllocResult = gif.allocTurboBuf(GIFAlloc);
+    if (memAllocResult != GIF_SUCCESS)
+    {
+      // Not Enough Memory
+      return memAllocResult;
+    }
 #endif
   }
   return openGif;
 }
 
-bool allocateBufferForGif(int width, int height)
+//
+// The memory management functions are needed to keep operating system
+// dependencies out of the core library code
+//
+// memory allocation callback function
+void *GIFAlloc(uint32_t u32Size)
 {
-  int frameBufferSize = width * (height + 3);
-  frameBuffer = (uint8_t *)malloc(frameBufferSize);
-  if (frameBuffer == NULL)
-  {
-    Serial.println("Not enough memory to allocate the frame buffer");
-    return false;
-  }
-
-  int iTurboSize = TURBO_BUFFER_SIZE + (width * height);
-  pTurboBuffer = (uint8_t *)malloc(iTurboSize);
-  if (pTurboBuffer == NULL)
-  {
-    Serial.println("Not enough memory to allocate the turbo buffer");
-    return false;
-  }
-  return true;
+  return malloc(u32Size);
+} /* GIFAlloc() */
+// memory free callback function
+void GIFFree(void *p)
+{
+  free(p);
 }
 
 //
