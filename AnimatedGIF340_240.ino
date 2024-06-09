@@ -5,6 +5,8 @@
                          // Tested on version...
 #include <AnimatedGIF.h> // Install this library with the Arduino IDE Library Manager
 
+#define USE_TURBO_MODE // Comment this line if you have insufficient memory at run time or if the ESP32 crashes when playing the GIF
+
 // Eyes GIF files
 #include "gif_files\radar.h"
 #include "gif_files\hud_a.h"
@@ -67,7 +69,9 @@ int openGif()
     Serial.printf("Successfully opened GIF; Canvas size = %d x %d\n", gif.getCanvasWidth(), gif.getCanvasHeight());
     gif.setDrawType(GIF_DRAW_COOKED); // We want the library to generate ready-made pixels
     gif.setFrameBuf(frameBuffer);
+#ifdef USE_TURBO_MODE
     gif.setTurboBuf(pTurboBuffer); // Turbo Mode
+#endif
   }
   return openGif;
 }
