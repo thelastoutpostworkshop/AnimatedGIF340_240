@@ -11,11 +11,12 @@
 #include "gif_files\death_star.h"
 #include "gif_files\star_destroyer.h"
 #include "gif_files\star_destroyer_planet.h"
+#include "gif_files\cat.h"
 
 BB_SPI_LCD tft;
 
 // GIF to display
-#define GifData star_destroyer_planet // Change image to display (image name in gif_files\[image header file].h)
+#define GifData cat // Change image to display (image name in gif_files\[image header file].h)
 
 void setup()
 {
