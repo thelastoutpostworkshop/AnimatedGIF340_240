@@ -5,7 +5,7 @@
                          // Tested on version...
 #include <AnimatedGIF.h> // Install this library with the Arduino IDE Library Manager
 
-// Eyes GIF files
+// GIF files
 #include "gif_files\hud_a.h"
 #include "gif_files\x_wing.h"
 #include "gif_files\death_star.h"
