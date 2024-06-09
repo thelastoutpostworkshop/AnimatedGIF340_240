@@ -8,7 +8,6 @@
 // #define USE_TURBO_MODE // Comment this line if you have insufficient memory at run time or if the ESP32 crashes when playing the GIF
 
 // Eyes GIF files
-#include "gif_files\radar.h"
 #include "gif_files\hud_a.h"
 #include "gif_files\x_wing.h"
 #include "gif_files\death_star.h"
@@ -18,9 +17,8 @@
 BB_SPI_LCD tft;
 AnimatedGIF gif;
 
-// GIF
-#define GIF_Rotation 3 // Adjust Rotation of your screen (0-3)
-#define GifData hud_a  // Change image to display (image name in gif_files\[image header file].h)
+// GIF to display
+#define GifData x_wing  // Change image to display (image name in gif_files\[image header file].h)
 
 void setup()
 {
