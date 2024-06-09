@@ -15,7 +15,7 @@
 BB_SPI_LCD tft;
 
 // GIF to display
-#define GifData star_destroyer // Change image to display (image name in gif_files\[image header file].h)
+#define GifData star_destroyer_planet // Change image to display (image name in gif_files\[image header file].h)
 
 void setup()
 {
