@@ -13,58 +13,67 @@
 #include "gif_files\star_destroyer_planet.h"
 
 BB_SPI_LCD tft;
-AnimatedGIF gif;
 
 // GIF to display
-#define GifData x_wing  // Change image to display (image name in gif_files\[image header file].h)
+#define GifData x_wing // Change image to display (image name in gif_files\[image header file].h)
 
 void setup()
 {
   Serial.begin(115200);
   tft.begin(LCD_ILI9341, FLAGS_NONE, 40000000, 8, 3, 9, -1, -1, 17, 18);
-  tft.setRotation(LCD_ORIENTATION_270); // Make sure you have the right orientation based on your GIF
+  tft.setRotation(LCD_ORIENTATION_270); // Make sure you have the right orientation based on your GIF or the GIF will show incorrectly
   tft.fillScreen(TFT_BLACK);
 
-  if (!openGif((uint8_t*)GifData,sizeof(GifData)))
+  AnimatedGIF *gif;
+  gif = openGif((uint8_t *)GifData, sizeof(GifData));
+  if (gif == NULL)
   {
     Serial.println("Cannot open GIF");
-    printGifErrorMessage(gif.getLastError());
     while (true)
     {
       //  no need to continue
     }
   }
+
+  while (true)
+  {
+    gif->playFrame(false, NULL);
+  }
 }
 
 void loop()
 {
-  playGifFrame();
-}
-
-void playGifFrame()
-{
-  gif.playFrame(false, NULL);
 }
 
 // Open Gif and allocate memory
-int openGif(uint8_t *gifdata,size_t gifsize)
+AnimatedGIF *openGif(uint8_t *gifdata, size_t gifsize)
 {
-  gif.begin(GIF_PALETTE_RGB565_BE); // Set the cooked output type we want (compatible with SPI LCDs)
-
-  int openGif, memAllocResult;
-  openGif = gif.open(gifdata, gifsize, GIFDraw);
-  if (openGif)
+  AnimatedGIF *gif;
+  gif = (AnimatedGIF *)malloc(sizeof(AnimatedGIF));
+  if (gif == NULL)
   {
-    Serial.printf("Successfully opened GIF; Canvas size = %d x %d\n", gif.getCanvasWidth(), gif.getCanvasHeight());
-    gif.setDrawType(GIF_DRAW_COOKED); // We want the library to generate ready-made pixels
-    memAllocResult = gif.allocFrameBuf(GIFAlloc);
-    if (memAllocResult != GIF_SUCCESS)
-    {
-      // Not Enough Memory
-      return memAllocResult;
-    }
+    Serial.println("Not Enough memory for GIF structure");
+    return NULL;
   }
-  return openGif;
+
+  gif->begin(GIF_PALETTE_RGB565_BE); // Set the cooked output type we want (compatible with SPI LCDs)
+
+  if (gif->open(gifdata, gifsize, GIFDraw))
+  {
+    Serial.printf("Successfully opened GIF; Canvas size = %d x %d\n", gif->getCanvasWidth(), gif->getCanvasHeight());
+    gif->setDrawType(GIF_DRAW_COOKED); // We want the library to generate ready-made pixels
+    if (gif->allocFrameBuf(GIFAlloc) != GIF_SUCCESS)
+    {
+      Serial.println("Not Enough memory for frame buffer");
+      return NULL;
+    }
+    return gif;
+  }
+  else
+  {
+    printGifErrorMessage(gif->getLastError());
+    return NULL;
+  }
 }
 
 //
