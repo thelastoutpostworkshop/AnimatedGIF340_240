@@ -1,9 +1,12 @@
 // Master Animated GIF
-//
+// Youtube Tutorial:
+// This is tested with Espressif ESP32 Arduino Core v3.0.1
+// Using ESP32-S3 &
 
 #include <bb_spi_lcd.h>  // Install this library with the Arduino IDE Library Manager
-                         // Tested on version...
+                         // Tested on version 2.5.3
 #include <AnimatedGIF.h> // Install this library with the Arduino IDE Library Manager
+                         // Tested on version 2.1.0
 
 // GIF files
 #include "gif_files\hud_a.h"
