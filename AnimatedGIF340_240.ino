@@ -17,7 +17,7 @@
 #include "gif_files\cat.h"
 #include "gif_files\star_trek_hud.h"
 
-BB_SPI_LCD tft;
+BB_SPI_LCD tft; // Main object for the display driver
 
 // GIF to display
 #define GifData star_trek_hud // Change image to display (image name in gif_files\[image header file].h)
@@ -96,16 +96,8 @@ void GIFFree(void *p)
   free(p);
 }
 
-//
+
 // Draw callback from the AnimatedGIF decoder
-//
-// Called once for each line of the current frame
-// MCUs with minimal RAM would have to process "RAW" pixels into "COOKED" here.
-// "Cooking" involves testing for disposal methods, merging non-transparent pixels
-// and translating the raw pixels through the palette to generate the final output.
-// The code for MCUs with enough RAM is much simpler because the AnimatedGIF library can
-// generate "cooked" pixels that are ready to send to the display as-is.
-//
 void GIFDraw(GIFDRAW *pDraw)
 {
   if (pDraw->y == 0)
@@ -113,10 +105,10 @@ void GIFDraw(GIFDRAW *pDraw)
     tft.setAddrWindow(pDraw->iX, pDraw->iY, pDraw->iWidth, pDraw->iHeight);
   }
   // For all other lines, just push the pixels to the display. We requested 'COOKED'big-endian RGB565 and
-  // the library provides them here. No need to do anything except push them right to the display
   tft.pushPixels((uint16_t *)pDraw->pPixels, pDraw->iWidth);
-} /* GIFDraw() */
+} 
 
+// Get human-readable error related to GIF
 void printGifErrorMessage(int errorCode)
 {
   switch (errorCode)
