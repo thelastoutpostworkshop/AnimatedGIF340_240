@@ -49,6 +49,8 @@ void setup()
 
 void loop()
 {
+  Serial.println("test");
+  delay(1);
 }
 
 // Open Gif and allocate memory
