@@ -1,2 +1,2 @@
 # Name,   Type, SubType, Offset,  Size, Flags
-factory,  app,  factory, , 4000K,
+nvs,app,factory,,4032K,
