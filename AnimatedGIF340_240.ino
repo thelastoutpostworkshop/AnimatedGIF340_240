@@ -1,12 +1,12 @@
 // Master Animated GIF
 // Youtube Tutorial:
-// This is tested with Espressif ESP32 Arduino Core v3.0.1
-// Using ESP32-S3 &
+// Tested with Espressif ESP32 Arduino Core v3.0.2
+// Using ESP32-S3
 
 #include <bb_spi_lcd.h>  // Install this library with the Arduino IDE Library Manager
-                         // Tested on version 2.5.3
+                         // Tested on version 2.5.4
 #include <AnimatedGIF.h> // Install this library with the Arduino IDE Library Manager
-                         // Tested on version 2.1.0
+                         // Tested on version 2.1.1
 
 // GIF files
 #include "gif_files\hud_a.h"
@@ -21,13 +21,15 @@
 BB_SPI_LCD tft; // Main object for the display driver
 
 // GIF to display
-#define GifData jedi_battle // Change image to display (image name in gif_files\[image header file].h)
+#define GifData death_star // Change image to display (image name in gif_files\[image header file].h)
 
 void setup()
 {
   Serial.begin(115200);
-  tft.begin(LCD_ILI9341, FLAGS_NONE, 40000000, 8, 3, 9, -1, -1, 17, 18);
-  tft.setRotation(LCD_ORIENTATION_270); // Make sure you have the right orientation based on your GIF or the GIF will show incorrectly
+  tft.begin(LCD_ILI9341, FLAGS_NONE, 40000000, 8, 3, 9, -1, -1, 17, 18); //
+  tft.setRotation(LCD_ORIENTATION_270); // Make sure you have the right orientation based on your GIF 
+                                        // or the GIF will show incorrectly
+                                        // Values : LCD_ORIENTATION_0, LCD_ORIENTATION_90, LCD_ORIENTATION_180 or LCD_ORIENTATION_270
   tft.fillScreen(TFT_BLACK);
 
   AnimatedGIF *gif;
