@@ -15,7 +15,7 @@
 #include "gif_files\star_destroyer.h"         //GIF size in FLASH memory is 1MB
 #include "gif_files\star_destroyer_planet.h"  //GIF size in FLASH memory is 2.3MB
 #include "gif_files\cat.h"                    //GIF size in FLASH memory is 1.1MB
-#include "gif_files\star_trek_hud.h"          //GIF size in FLASH memory is
+#include "gif_files\star_trek_hud.h"          //GIF size in FLASH memory is 1.6MB
 #include "gif_files\jedi_battle.h"            //GIF size in FLASH memory is
 
 BB_SPI_LCD tft; // Main object for the display driver
