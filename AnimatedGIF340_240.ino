@@ -10,7 +10,7 @@
 
 // GIF files
 #include "gif_files\hud_a.h"                  //GIF size in FLASH memory is 1.7MB
-#include "gif_files\x_wing.h"
+#include "gif_files\x_wing.h"                 //GIF size in FLASH memory is 0.9MB
 #include "gif_files\death_star.h"             //GIF size in FLASH memory is 1.7MB
 #include "gif_files\star_destroyer.h"
 #include "gif_files\star_destroyer_planet.h"
@@ -21,7 +21,7 @@
 BB_SPI_LCD tft; // Main object for the display driver
 
 // GIF to display
-#define GifData x_wing // Change image to display (image name in gif_files\[image header file].h)
+#define GifData star_destroyer // Change image to display (image name in gif_files\[image header file].h)
 
 void setup()
 {
