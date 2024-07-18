@@ -2,6 +2,7 @@
 // Youtube Tutorial:
 // Tested with Espressif ESP32 Arduino Core v3.0.2
 // Using ESP32-S3 with 8MB of PSRAM
+#include "esp_flash.h"
 
 #include <bb_spi_lcd.h>  // Install this library with the Arduino IDE Library Manager
                          // Tested on version 2.5.4
@@ -9,14 +10,14 @@
                          // Tested on version 2.1.1
 
 // GIF files
-#include "gif_files\hud_a.h"                  //GIF size in FLASH memory is 1.7MB
-#include "gif_files\x_wing.h"                 //GIF size in FLASH memory is 0.9MB
-#include "gif_files\death_star.h"             //GIF size in FLASH memory is 1.7MB
-#include "gif_files\star_destroyer.h"         //GIF size in FLASH memory is 1MB
-#include "gif_files\star_destroyer_planet.h"  //GIF size in FLASH memory is 2.3MB
-#include "gif_files\cat.h"                    //GIF size in FLASH memory is 1.1MB
-#include "gif_files\star_trek_hud.h"          //GIF size in FLASH memory is 1.6MB
-#include "gif_files\jedi_battle.h"            //GIF size in FLASH memory is 3.3MB (use partitions.csv for this one!)
+#include "gif_files\hud_a.h"                 //GIF size in FLASH memory is 1.7MB
+#include "gif_files\x_wing.h"                //GIF size in FLASH memory is 0.9MB
+#include "gif_files\death_star.h"            //GIF size in FLASH memory is 1.7MB
+#include "gif_files\star_destroyer.h"        //GIF size in FLASH memory is 1MB
+#include "gif_files\star_destroyer_planet.h" //GIF size in FLASH memory is 2.3MB
+#include "gif_files\cat.h"                   //GIF size in FLASH memory is 1.1MB
+#include "gif_files\star_trek_hud.h"         //GIF size in FLASH memory is 1.6MB
+#include "gif_files\jedi_battle.h"           //GIF size in FLASH memory is 3.3MB (use partitions.csv for this one, if you your ESP32 board has 4MB Flash size)
 
 BB_SPI_LCD tft; // Main object for the display driver
 
@@ -27,10 +28,12 @@ void setup()
 {
   Serial.begin(115200);
   tft.begin(LCD_ILI9341, FLAGS_NONE, 40000000, 8, 3, 9, -1, -1, 17, 18); //
-  tft.setRotation(LCD_ORIENTATION_270); // Make sure you have the right orientation based on your GIF 
-                                        // or the GIF will show incorrectly
-                                        // Values : LCD_ORIENTATION_0, LCD_ORIENTATION_90, LCD_ORIENTATION_180 or LCD_ORIENTATION_270
+  tft.setRotation(LCD_ORIENTATION_270);                                  // Make sure you have the right orientation based on your GIF
+                                                                         // or the GIF will show incorrectly
+                                                                         // Values : LCD_ORIENTATION_0, LCD_ORIENTATION_90, LCD_ORIENTATION_180 or LCD_ORIENTATION_270
   tft.fillScreen(TFT_BLACK);
+
+  printFlashInfo();
 
   AnimatedGIF *gif;
   gif = openGif((uint8_t *)GifData, sizeof(GifData));
@@ -71,7 +74,7 @@ AnimatedGIF *openGif(uint8_t *gifdata, size_t gifsize)
   if (gif->open(gifdata, gifsize, GIFDraw))
   {
     Serial.printf("Successfully opened GIF; Canvas size = %d x %d\n", gif->getCanvasWidth(), gif->getCanvasHeight());
-    Serial.printf("GIF memory size is %ld",gifsize);
+    Serial.printf("GIF memory size is %ld", gifsize);
     gif->setDrawType(GIF_DRAW_COOKED); // We want the Animated GIF library to generate ready-made pixels
     if (gif->allocFrameBuf(GIFAlloc) != GIF_SUCCESS)
     {
@@ -102,7 +105,6 @@ void GIFFree(void *p)
   free(p);
 }
 
-
 // Draw callback from the AnimatedGIF decoder
 void GIFDraw(GIFDRAW *pDraw)
 {
@@ -112,7 +114,7 @@ void GIFDraw(GIFDRAW *pDraw)
   }
   // For all other lines, just push the pixels to the display. We requested 'COOKED'big-endian RGB565 and
   tft.pushPixels((uint16_t *)pDraw->pPixels, pDraw->iWidth);
-} 
+}
 
 // Get human-readable error related to GIF
 void printGifErrorMessage(int errorCode)
@@ -150,4 +152,17 @@ void printGifErrorMessage(int errorCode)
     Serial.println("Unknown Error");
     break;
   }
+}
+
+// Get information about the flash chip
+void printFlashInfo(void)
+{
+  esp_flash_t *flash = esp_flash_default_chip;
+  uint32_t flash_size;
+  if (esp_flash_get_size(flash, &flash_size) != ESP_OK)
+  {
+    Serial.println("Failed to get flash size");
+    return;
+  }
+  Serial.printf("\nTotal flash size: %u bytes (%dMB)\n", flash_size,flash_size/(1024*1024));
 }
