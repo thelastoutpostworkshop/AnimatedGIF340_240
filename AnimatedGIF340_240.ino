@@ -11,7 +11,7 @@
 // GIF files
 #include "gif_files\hud_a.h"
 #include "gif_files\x_wing.h"
-#include "gif_files\death_star.h"
+#include "gif_files\death_star.h"             //GIF size in FLASH memory is 1.7MB
 #include "gif_files\star_destroyer.h"
 #include "gif_files\star_destroyer_planet.h"
 #include "gif_files\cat.h"
@@ -21,7 +21,7 @@
 BB_SPI_LCD tft; // Main object for the display driver
 
 // GIF to display
-#define GifData death_star // Change image to display (image name in gif_files\[image header file].h)
+#define GifData hud_a // Change image to display (image name in gif_files\[image header file].h)
 
 void setup()
 {
@@ -71,7 +71,8 @@ AnimatedGIF *openGif(uint8_t *gifdata, size_t gifsize)
   if (gif->open(gifdata, gifsize, GIFDraw))
   {
     Serial.printf("Successfully opened GIF; Canvas size = %d x %d\n", gif->getCanvasWidth(), gif->getCanvasHeight());
-    gif->setDrawType(GIF_DRAW_COOKED); // We want the library to generate ready-made pixels
+    Serial.printf("GIF memory size is %ld",gifsize);
+    gif->setDrawType(GIF_DRAW_COOKED); // We want the Animated GIF library to generate ready-made pixels
     if (gif->allocFrameBuf(GIFAlloc) != GIF_SUCCESS)
     {
       Serial.println("Not Enough memory for frame buffer");
