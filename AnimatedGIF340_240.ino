@@ -16,12 +16,12 @@
 #include "gif_files\star_destroyer_planet.h"  //GIF size in FLASH memory is 2.3MB
 #include "gif_files\cat.h"                    //GIF size in FLASH memory is 1.1MB
 #include "gif_files\star_trek_hud.h"          //GIF size in FLASH memory is 1.6MB
-#include "gif_files\jedi_battle.h"            //GIF size in FLASH memory is
+#include "gif_files\jedi_battle.h"            //GIF size in FLASH memory is 3.3MB (use partitions.csv for this one!)
 
 BB_SPI_LCD tft; // Main object for the display driver
 
 // GIF to display
-#define GifData star_trek_hud // Change image to display (image name in gif_files\[image header file].h)
+#define GifData jedi_battle // Change image to display (image name in gif_files\[image header file].h)
 
 void setup()
 {
