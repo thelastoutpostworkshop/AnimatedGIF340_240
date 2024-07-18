@@ -24,7 +24,7 @@
 BB_SPI_LCD tft; // Main object for the display driver
 
 // GIF to display
-#define GifData jedi_battle // Change image to display (image name in gif_files\[image header file].h)
+#define GifData x_wing // Change image to display (image name in gif_files\[image header file].h)
 
 void setup()
 {
@@ -76,7 +76,7 @@ AnimatedGIF *openGif(uint8_t *gifdata, size_t gifsize)
   if (gif->open(gifdata, gifsize, GIFDraw))
   {
     Serial.printf("Successfully opened GIF; Canvas size = %d x %d\n", gif->getCanvasWidth(), gif->getCanvasHeight());
-    Serial.printf("GIF memory size is %ld ((%.2f MB)", gifsize,gifsize/(1024*1024));
+    Serial.printf("GIF memory size is %ld (%2.2f MB)", gifsize, (float)gifsize / (1024 * 1024));
     gif->setDrawType(GIF_DRAW_COOKED); // We want the Animated GIF library to generate ready-made pixels
     if (gif->allocFrameBuf(GIFAlloc) != GIF_SUCCESS)
     {
@@ -166,14 +166,16 @@ void printFlashInfo(void)
     Serial.println("Failed to get flash size");
     return;
   }
-  Serial.printf("\nTotal flash size: %u bytes (%.2f MB)\n", flash_size,flash_size/(1024*1024));
+  Serial.printf("\nTotal flash size: %u bytes (%2.2f MB)\n", flash_size, (float)(flash_size / (1024 * 1024)));
 
-    // Calculate used flash memory
+  // Calculate used flash memory
   uint32_t used_flash = 0;
   esp_partition_iterator_t it = esp_partition_find(ESP_PARTITION_TYPE_ANY, ESP_PARTITION_SUBTYPE_ANY, NULL);
-  if (it != NULL) {
-    do {
-      const esp_partition_t* partition = esp_partition_get(it);
+  if (it != NULL)
+  {
+    do
+    {
+      const esp_partition_t *partition = esp_partition_get(it);
       used_flash += partition->size;
       // Serial.printf("Partition: %s, Type: 0x%02X, Subtype: 0x%02X, Address: 0x%08X, Size: %u bytes\n",
       //               partition->label, partition->type, partition->subtype, partition->address, partition->size);
@@ -182,6 +184,6 @@ void printFlashInfo(void)
     esp_partition_iterator_release(it);
   }
 
-  Serial.printf("Used flash size: %u bytes (%.2f MB)\n", used_flash,used_flash/(1024*1024));
-  Serial.printf("Free flash size: %u bytes (%.2f MB)\n", flash_size - used_flash,(flash_size - used_flash)/(1024*1024));
+  Serial.printf("Used flash size: %u bytes (%2.2f MB)\n", used_flash, (float)used_flash / (1024 * 1024));
+  Serial.printf("Free flash size: %u bytes (%2.2f MB)\n", flash_size - used_flash, (float)(flash_size - used_flash) / (1024 * 1024));
 }
