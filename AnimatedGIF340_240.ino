@@ -1,7 +1,7 @@
 // Master Animated GIF
 // Youtube Tutorial:
 // Tested with Espressif ESP32 Arduino Core v3.0.2
-// Using ESP32-S3
+// Using ESP32-S3 with 8MB of PSRAM
 
 #include <bb_spi_lcd.h>  // Install this library with the Arduino IDE Library Manager
                          // Tested on version 2.5.4
