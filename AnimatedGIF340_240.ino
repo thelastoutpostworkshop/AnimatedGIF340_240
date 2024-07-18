@@ -76,7 +76,7 @@ AnimatedGIF *openGif(uint8_t *gifdata, size_t gifsize)
   if (gif->open(gifdata, gifsize, GIFDraw))
   {
     Serial.printf("Successfully opened GIF; Canvas size = %d x %d\n", gif->getCanvasWidth(), gif->getCanvasHeight());
-    Serial.printf("GIF memory size is %ld (%dMB)", gifsize,gifsize/(1024*1024));
+    Serial.printf("GIF memory size is %ld ((%.2f MB)", gifsize,gifsize/(1024*1024));
     gif->setDrawType(GIF_DRAW_COOKED); // We want the Animated GIF library to generate ready-made pixels
     if (gif->allocFrameBuf(GIFAlloc) != GIF_SUCCESS)
     {
@@ -166,7 +166,7 @@ void printFlashInfo(void)
     Serial.println("Failed to get flash size");
     return;
   }
-  Serial.printf("\nTotal flash size: %u bytes (%dMB)\n", flash_size,flash_size/(1024*1024));
+  Serial.printf("\nTotal flash size: %u bytes (%.2f MB)\n", flash_size,flash_size/(1024*1024));
 
     // Calculate used flash memory
   uint32_t used_flash = 0;
@@ -182,6 +182,6 @@ void printFlashInfo(void)
     esp_partition_iterator_release(it);
   }
 
-  Serial.printf("Used flash size: %u bytes (%dMB)\n", used_flash,used_flash/(1024*1024));
-  Serial.printf("Free flash size: %u bytes  (%dMB)\n", flash_size - used_flash,(flash_size - used_flash)/(1024*1024));
+  Serial.printf("Used flash size: %u bytes (%.2f MB)\n", used_flash,used_flash/(1024*1024));
+  Serial.printf("Free flash size: %u bytes (%.2f MB)\n", flash_size - used_flash,(flash_size - used_flash)/(1024*1024));
 }
