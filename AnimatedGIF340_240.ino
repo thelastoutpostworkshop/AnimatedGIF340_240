@@ -67,7 +67,7 @@ AnimatedGIF *openGif(uint8_t *gifdata, size_t gifsize)
   gif = (AnimatedGIF *)malloc(sizeof(AnimatedGIF));
   if (gif == NULL)
   {
-    Serial.println("Not Enough memory for GIF structure");
+    Serial.println("Not RAM Enough memory for GIF structure");
     return NULL;
   }
 
@@ -80,7 +80,7 @@ AnimatedGIF *openGif(uint8_t *gifdata, size_t gifsize)
     gif->setDrawType(GIF_DRAW_COOKED); // We want the Animated GIF library to generate ready-made pixels
     if (gif->allocFrameBuf(GIFAlloc) != GIF_SUCCESS)
     {
-      Serial.println("Not Enough memory for frame buffer");
+      Serial.println("Not Enough RAM memory for frame buffer");
       return NULL;
     }
     return gif;
