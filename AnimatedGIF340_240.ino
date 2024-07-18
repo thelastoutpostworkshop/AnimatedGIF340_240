@@ -1,8 +1,10 @@
-// Master Animated GIF
+// Master Animated GIF on a 320x240 SPI LCD Screen
 // Youtube Tutorial:
 // Tested with Espressif ESP32 Arduino Core v3.0.2
 // Using ESP32-S3 with 8MB of PSRAM
+//
 #include "esp_flash.h"
+#include "esp_partition.h"
 
 #include <bb_spi_lcd.h>  // Install this library with the Arduino IDE Library Manager
                          // Tested on version 2.5.4
@@ -74,7 +76,7 @@ AnimatedGIF *openGif(uint8_t *gifdata, size_t gifsize)
   if (gif->open(gifdata, gifsize, GIFDraw))
   {
     Serial.printf("Successfully opened GIF; Canvas size = %d x %d\n", gif->getCanvasWidth(), gif->getCanvasHeight());
-    Serial.printf("GIF memory size is %ld", gifsize);
+    Serial.printf("GIF memory size is %ld (%dMB)", gifsize,gifsize/(1024*1024));
     gif->setDrawType(GIF_DRAW_COOKED); // We want the Animated GIF library to generate ready-made pixels
     if (gif->allocFrameBuf(GIFAlloc) != GIF_SUCCESS)
     {
@@ -165,4 +167,21 @@ void printFlashInfo(void)
     return;
   }
   Serial.printf("\nTotal flash size: %u bytes (%dMB)\n", flash_size,flash_size/(1024*1024));
+
+    // Calculate used flash memory
+  uint32_t used_flash = 0;
+  esp_partition_iterator_t it = esp_partition_find(ESP_PARTITION_TYPE_ANY, ESP_PARTITION_SUBTYPE_ANY, NULL);
+  if (it != NULL) {
+    do {
+      const esp_partition_t* partition = esp_partition_get(it);
+      used_flash += partition->size;
+      // Serial.printf("Partition: %s, Type: 0x%02X, Subtype: 0x%02X, Address: 0x%08X, Size: %u bytes\n",
+      //               partition->label, partition->type, partition->subtype, partition->address, partition->size);
+      it = esp_partition_next(it);
+    } while (it != NULL);
+    esp_partition_iterator_release(it);
+  }
+
+  Serial.printf("Used flash size: %u bytes (%dMB)\n", used_flash,used_flash/(1024*1024));
+  Serial.printf("Free flash size: %u bytes  (%dMB)\n", flash_size - used_flash,(flash_size - used_flash)/(1024*1024));
 }
