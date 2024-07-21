@@ -35,8 +35,6 @@ void setup()
                                                                          // Values : LCD_ORIENTATION_0, LCD_ORIENTATION_90, LCD_ORIENTATION_180 or LCD_ORIENTATION_270
   tft.fillScreen(TFT_BLACK);
 
-  printFlashInfo();
-
   AnimatedGIF *gif;
   gif = openGif((uint8_t *)GifData, sizeof(GifData));
   if (gif == NULL)
@@ -153,36 +151,4 @@ void printGifErrorMessage(int errorCode)
     Serial.println("Unknown Error");
     break;
   }
-}
-
-// Get information about the flash chip
-void printFlashInfo(void)
-{
-  esp_flash_t *flash = esp_flash_default_chip;
-  uint32_t flash_size;
-  if (esp_flash_get_size(flash, &flash_size) != ESP_OK)
-  {
-    Serial.println("Failed to get flash size");
-    return;
-  }
-  Serial.printf("\nTotal flash size: %u bytes (%2.2f MB)\n", flash_size, (float)(flash_size / (1024 * 1024)));
-
-  // Calculate used flash memory
-  uint32_t used_flash = 0;
-  esp_partition_iterator_t it = esp_partition_find(ESP_PARTITION_TYPE_ANY, ESP_PARTITION_SUBTYPE_ANY, NULL);
-  if (it != NULL)
-  {
-    do
-    {
-      const esp_partition_t *partition = esp_partition_get(it);
-      used_flash += partition->size;
-      // Serial.printf("Partition: %s, Type: 0x%02X, Subtype: 0x%02X, Address: 0x%08X, Size: %u bytes\n",
-      //               partition->label, partition->type, partition->subtype, partition->address, partition->size);
-      it = esp_partition_next(it);
-    } while (it != NULL);
-    esp_partition_iterator_release(it);
-  }
-
-  Serial.printf("Used flash size: %u bytes (%2.2f MB)\n", used_flash, (float)used_flash / (1024 * 1024));
-  Serial.printf("Free flash size: %u bytes (%2.2f MB)\n", flash_size - used_flash, (float)(flash_size - used_flash) / (1024 * 1024));
 }
