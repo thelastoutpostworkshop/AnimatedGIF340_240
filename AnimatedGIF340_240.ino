@@ -2,6 +2,7 @@
 // Youtube Tutorial:
 // Tested with Espressif ESP32 Arduino Core v3.0.2
 // Using ESP32-S3 with 8MB of PSRAM
+// See also the Tutorial on how to create ESP32 custom partitions:
 //
 #include "esp_flash.h"
 #include "esp_partition.h"
@@ -24,13 +25,13 @@
 BB_SPI_LCD tft; // Main object for the display driver
 
 // GIF to display
-#define GifData x_wing // Change image to display (image name in gif_files\[image header file].h)
+#define GifData jedi_battle // Change image to display (image name in gif_files\[image header file].h)
 
 void setup()
 {
   Serial.begin(115200);
   tft.begin(LCD_ILI9341, FLAGS_NONE, 40000000, 8, 18, 17, -1, -1, 9, 3); //
-  tft.setRotation(LCD_ORIENTATION_270);                                  // Make sure you have the right orientation based on your GIF
+  tft.setRotation(LCD_ORIENTATION_90);                                   // Make sure you have the right orientation based on your GIF
                                                                          // or the GIF will show incorrectly, even garbage output
                                                                          // Values : LCD_ORIENTATION_0, LCD_ORIENTATION_90, LCD_ORIENTATION_180 or LCD_ORIENTATION_270
   tft.fillScreen(TFT_BLACK);
