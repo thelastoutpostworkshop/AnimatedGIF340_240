@@ -8,5 +8,3 @@
 
 Use this code to show animated GIF on the 320x240 LCD ILI9341 display.
 The animated GIF is uploaded in program memory along with the code.
-
-![Usage](https://github.com/thelastoutpostworkshop/animated_gif_memory/blob/main/images/doc/Animated%20GIF.png)
