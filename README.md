@@ -4,7 +4,7 @@
 </a><br/>
 
 ## Youtube Tutorial
-[<img src="https://github.com/thelastoutpostworkshop/images/blob/main/Custom%20Partitions.png" width="300">](https://youtu.be/omUWkUqFYrQ)
+[<img src="https://github.com/thelastoutpostworkshop/images/blob/main/Animated%20GIF%20320x240-1.png" width="300">](https://youtu.be/omUWkUqFYrQ)
 
 Use this code to show animated GIF on the 320x240 LCD ILI9341 display.
 The animated GIF is uploaded in program memory along with the code.
