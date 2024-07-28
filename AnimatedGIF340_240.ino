@@ -25,7 +25,7 @@
 BB_SPI_LCD tft; // Main object for the display driver
 
 // GIF to display
-#define GifData jedi_battle // Change image to display (image name in gif_files\[image header file].h)
+#define GifData death_star // Change image to display (image name in gif_files\[image header file].h)
 
 void setup()
 {
