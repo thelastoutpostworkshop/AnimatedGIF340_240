@@ -1,6 +1,6 @@
 // Master Animated GIF on a 320x240 SPI LCD Screen
 // Youtube Tutorial: https://youtu.be/omUWkUqFYrQ
-// Tested with Espressif ESP32 Arduino Core v3.0.2
+// Tested with Espressif ESP32 Arduino Core v3.0.2, 3.0.3
 // Using ESP32-S3 with 8MB of PSRAM
 // See also the Tutorial on how to create ESP32 custom partitions:
 //
