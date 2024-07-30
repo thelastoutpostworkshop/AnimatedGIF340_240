@@ -8,7 +8,7 @@
 #include "esp_partition.h"
 
 #include <bb_spi_lcd.h>  // Install this library with the Arduino IDE Library Manager
-                         // Tested on version 2.5.4
+                         // Tested on version 2.5.4, 2.6.0
 #include <AnimatedGIF.h> // Install this library with the Arduino IDE Library Manager
                          // Tested on version 2.1.1
 
